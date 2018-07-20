@@ -7,6 +7,7 @@ bound = ->
   @a += 1
 .bind my_class_inst
 context = => my_class_inst.a += 1
+func = (o) => o.a += 1
 bench = require '../bench'
 N = 1e7
 
@@ -25,7 +26,13 @@ c = =>
     my_class_inst.add()
   my_class_inst.a = 0
 
+d = =>
+  for i in [1..N]
+    func my_class_inst
+  my_class_inst.a = 0
+
 bench.addCase 'bounded function', a
 .addCase 'context function', b
 .addCase 'method', c
+.addCase 'parameterized function', c
 .run 100
