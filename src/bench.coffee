@@ -32,6 +32,8 @@ sampleStd = (data) =>
     Math.sqrt stdN / (n - 1)
 
 cases = []
+prepare = => undefined
+p = Promise.resolve()
 
 addCase = (description, func) =>
   cases.push {description, func}
@@ -39,7 +41,7 @@ addCase = (description, func) =>
 
 exec = (item) =>
   start = time.bigint()
-  item.func()
+  await do item.func
   end = time.bigint()
   item.samples.push end - start
 
@@ -58,27 +60,37 @@ printResult = (item) =>
       'slowest'
   console.log result.join '\t'
 
+runSamples = (samples) =>
+  for i in [1..samples]
+    readline.clearLine process.stdout, 0
+    console.log "Sampling ##{i}"
+    await do prepare
+    await Promise.all cases.map exec
+    readline.moveCursor process.stdout, 0, -1
+
 run = (samples = 32) =>
   if not (samples > 0)
     throw new Error 'Sample counts need > 0'
   cases.forEach (item) =>
     item.rank = 0
     item.samples = []
-  for i in [1..samples]
+  p = p.then runSamples.bind null, samples
+  .catch console.error.bind console
+  .then =>
+    times = cases.map (item) => sum item.samples
+    if samples > 1
+      cases[argmin times].rank = 1
+      cases[argmax times].rank = 2
+    cases.forEach (item, i) =>
+      item.avg = parseFloat(times[i]) / samples
+      item.std = sampleStd item.samples
     readline.clearLine process.stdout, 0
-    console.log "Sampling ##{i}"
-    cases.forEach exec
-    readline.moveCursor process.stdout, 0, -1
-  times = cases.map (item) => sum item.samples
-  if samples > 1
-    cases[argmin times].rank = 1
-    cases[argmax times].rank = 2
-  cases.forEach (item, i) =>
-    item.avg = parseFloat(times[i]) / samples
-    item.std = sampleStd item.samples
-  readline.clearLine process.stdout, 0
-  cases.forEach printResult
+    cases.forEach printResult
   bench
 
-bench = {addCase, run}
+setPrepare = (f) =>
+  prepare = f
+  bench
+
+bench = {addCase, run, setPrepare}
 module.exports = bench

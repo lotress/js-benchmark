@@ -4,9 +4,9 @@
 A collection of some javascript benchmarks.
 
 ## Requirements
-Node.js >= v10.7
+- Node.js >= v10.7
 
-CoffeeScript >= v2.3
+- CoffeeScript >= v2.3
 
 ## Install
 ```bash
@@ -27,14 +27,18 @@ import bench from './bench'
 
 const N = 1e6
 var arr = Array.from({ length: N }, (_, i) => i)
+const p = () => {
+  // do something each sample before all cases
+}
 
 const case1 = () => arr.slice(0) // do some heavy computing
 
 const case2 = () => [...arr]
 
-bench.addCase("Array slice", case1)
+bench.setPrepare(p)
+.addCase("Array slice", case1)
 .addCase("Array splat", case2)
-.run(100) // Run each case 100 times, then print results to console
+.run(100) // Run each case 100 times, then print results to console, returns bench itself
 /*
 Bench Array slice:
         average time:   4.247ms ±19.910%       fastest
