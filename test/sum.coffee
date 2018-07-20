@@ -39,16 +39,22 @@ g = =>
   sum
 h = =>
   sum = 0
+  for i of arr
+    sum += arr[i]
+  sum
+h2 = =>
+  sum = 0
   for x in arr
     sum += x
   sum
 
 bench.addCase 'Array reduce', a
 .addCase 'Array forEach', d
-.addCase 'loop', b
+.addCase 'while', b
 .addCase 'pop loop', c
 #.addCase 'shift loop', e // too slow, skipped
 .addCase 'iterator', f
 .addCase 'for of', g
 .addCase 'for in', h
+.addCase 'for loop', h2
 .run 100

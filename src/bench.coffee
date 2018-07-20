@@ -65,7 +65,8 @@ runSamples = (samples) =>
     readline.clearLine process.stdout, 0
     console.log "Sampling ##{i}"
     await do prepare
-    await Promise.all cases.map exec
+    for item in cases
+      await exec item
     readline.moveCursor process.stdout, 0, -1
 
 run = (samples = 32) =>

@@ -115,13 +115,16 @@ printResult = (item) => {
 };
 
 runSamples = async(samples) => {
-  var i, j, ref, results;
+  var i, item, j, k, len, ref, results;
   results = [];
   for (i = j = 1, ref = samples; (1 <= ref ? j <= ref : j >= ref); i = 1 <= ref ? ++j : --j) {
     readline.clearLine(process.stdout, 0);
     console.log(`Sampling #${i}`);
     await prepare();
-    await Promise.all(cases.map(exec));
+    for (k = 0, len = cases.length; k < len; k++) {
+      item = cases[k];
+      await exec(item);
+    }
     results.push(readline.moveCursor(process.stdout, 0, -1));
   }
   return results;
