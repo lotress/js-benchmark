@@ -1,5 +1,5 @@
 bench = require '../bench'
-N = 1e5
+N = 1e6
 arr = (Math.random() for i in [1..N])
 a = => arr.reduce (sum, x) => sum + x
 b = =>
@@ -32,11 +32,23 @@ f = =>
     sum += t.value
     t = it.next()
   sum
+g = =>
+  sum = 0
+  for x from arr
+    sum += x
+  sum
+h = =>
+  sum = 0
+  for x in arr
+    sum += x
+  sum
 
 bench.addCase 'Array reduce', a
 .addCase 'Array forEach', d
 .addCase 'loop', b
 .addCase 'pop loop', c
-.addCase 'shift loop', e
+#.addCase 'shift loop', e // too slow, skipped
 .addCase 'iterator', f
-.run 1000
+.addCase 'for of', g
+.addCase 'for in', h
+.run 100
