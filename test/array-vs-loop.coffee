@@ -32,6 +32,11 @@ h = =>
   for i from numbers()
     arr[i] = i
   arr
+typed = =>
+  arr = new Uint32Array N
+  for i in [0...N]
+    arr[i] = i
+  arr
 bench.addCase 'Array.from', a
 .addCase 'Array splat', b
 .addCase 'Array fill', f
@@ -40,4 +45,5 @@ bench.addCase 'Array.from', a
 .addCase 'while push', e
 .addCase 'Generator', g
 .addCase 'Generator for-loop', h
+.addCase 'Uint32Array', typed
 .run 100
