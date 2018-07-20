@@ -1,10 +1,11 @@
-# common-node
+# Javascript Benchmarks
 ----
 ## What's this?
 A collection of some javascript benchmarks.
 
 ## Requirements
 Node.js >= v10.7
+
 CoffeeScript >= v2.3
 
 ## Install
@@ -24,15 +25,20 @@ A benchmark framework is included as [bench.js](./bench.js).
 ```javascript
 import bench from './bench'
 
-const benchCase = => {
-  // do some heavy computing
-}
+const N = 1e6
+var arr = Array.from({ length: N }, (_, i) => i)
 
-const case2 = => {
-  // do some heavy computing
-}
+const case1 = () => arr.slice(0) // do some heavy computing
 
-bench.addCase("bench description", benchCase)
-.addCase("bench case 2", case2)
-.run(32) // Run each case 32 times, then print results to console
+const case2 = () => [...arr]
+
+bench.addCase("Array slice", case1)
+.addCase("Array splat", case2)
+.run(100) // Run each case 100 times, then print results to console
+/*
+Bench Array slice:
+        average time:   4.247ms ±19.910%       fastest
+Bench Array splat:
+        average time:   31.657ms        ±9.583%        slowest
+*/
 ```
