@@ -1,5 +1,28 @@
-readline = require 'readline'
-time = process.hrtime
+resetLine = do =>
+  if process?.stdout
+    readline = require 'readline'
+    => readline.moveCursor process.stdout, 0, -1
+  else
+    => return
+
+now = do => if t = process?.hrtime
+  if t.bigint
+    console.log 'Using process.hrtime.bigint as timer'
+    => parseFloat(t.bigint()) * 1e-6
+  else
+    console.log 'Using process.hrtime as timer'
+    (time) =>
+      diff = process.hrtime time
+      if time
+        parseFloat diff[0] * 1e3 + diff[1] * 1e-6
+      else diff
+else if performance?.now
+  console.log 'Using performance.now as timer'
+  performance.now.bind performance
+else
+  console.warn 'Not found any High Resolution Timer,
+  using Date as a less precise baseline.'
+  Date.now
 
 compare = (a, b) => a - b
 r = (c) => (res, x, i) => if c(res.x, x) < 0 then res else {x, i}
@@ -40,18 +63,18 @@ addCase = (description, func) =>
   bench
 
 exec = (item) =>
-  start = time.bigint()
+  start = now()
   await do item.func
-  end = time.bigint()
+  end = now start
   item.samples.push end - start
 
-toFixed3 = (x) => x.toFixed(3)
+toFixed3 = (x) => x.toFixed 3
 
 getStdPersent = (item) => toFixed3 100 * item.std / item.avg
 
 printResult = (item) =>
   console.log "Bench #{item.description}:"
-  result = ['', 'average time:', "#{toFixed3(item.avg / 1e6)}ms",
+  result = ['', 'average time:', "#{toFixed3(item.avg)}ms",
     "±#{getStdPersent item}%"]
   result.push switch item.rank
     when 1
@@ -62,12 +85,11 @@ printResult = (item) =>
 
 runSamples = (samples) =>
   for i in [1..samples]
-    readline.clearLine process.stdout, 0
     console.log "Sampling ##{i}"
     await do prepare
     for item in cases
       await exec item
-    readline.moveCursor process.stdout, 0, -1
+    resetLine()
 
 run = (samples = 32) =>
   if not (samples > 0)
@@ -85,7 +107,6 @@ run = (samples = 32) =>
     cases.forEach (item, i) =>
       item.avg = parseFloat(times[i]) / samples
       item.std = sampleStd item.samples
-    readline.clearLine process.stdout, 0
     cases.forEach printResult
   bench
 

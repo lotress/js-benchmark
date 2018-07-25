@@ -4,9 +4,11 @@
 A collection of some javascript benchmarks.
 
 ## Requirements
-- Node.js >= v10.7
+- Broswer with ES7 support or Node.js >= v8.0, Node.js >= v10.7 recommended
 
 - CoffeeScript >= v2.3
+
+- Timer in Node.js is more precise than broswers due to security concerns.
 
 ## Install
 ```bash
