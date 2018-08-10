@@ -47,11 +47,18 @@ h2 = =>
   for x in arr
     sum += x
   sum
+splice = =>
+  sum = 0
+  t = arr[0..]
+  while t.length
+    sum += t.splice(t.length - 1, 1)[0]
+  sum
 
 bench.addCase 'Array reduce', a
 .addCase 'Array forEach', d
 .addCase 'while', b
 .addCase 'pop loop', c
+.addCase 'Array splice', splice
 #.addCase 'shift loop', e // too slow, skipped
 .addCase 'iterator', f
 .addCase 'for of', g
